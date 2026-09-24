@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Container from '../components/Container';
 
 type OrderStatus = 'processing' | 'shipped' | 'out for delivery' | 'delivered';

@@ -8,3 +8,7 @@ git clone https://github.com/EmranAli-15/vecosoft-task-1
 npm i
 npm run dev
 ```
+
+
+### live
+```https://inquisitive-kulfi-2f4526.netlify.app/```
