@@ -186,26 +186,37 @@ export default function OrdersListPage({ orders = DUMMY_ORDERS, onSelectOrder }:
                 <p className="text-base font-semibold opacity-60">No orders found matching your search or filter criteria.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 {DUMMY_ORDERS.map(ord => {
                   const delayed = isDelayed(ord.estimatedDelivery, ord.status);
                   const total = calculateOrderTotal(ord.items);
+
+                  // Dynamic border accent styling based on order status
+                  const statusBorderClass =
+                    ord.status === 'delivered' ? 'border-l-success' :
+                      ord.status === 'out for delivery' ? 'border-l-primary' : 'border-l-warning';
+
                   return (
-                    <Link to="/order-details">
-                      <div
-                        key={ord.orderId}
-                        className="card bg-base-200 border border-base-300 shadow-xs hover:border-primary transition-all duration-200 cursor-pointer group flex flex-col justify-between"
-                      >
+                    // ORD-98234-US
+                    <Link to={`${ord.orderId == "ORD-98234-US" ? "/no-tracking-details" : "order-details"}`} key={ord.orderId} className="block group">
+                      <div className={`card bg-base-200 border border-base-300 border-l-4 ${statusBorderClass} shadow-xs hover:shadow-md hover:border-primary transition-all duration-200 flex flex-col justify-between`}>
                         <div className="card-body p-5">
-                          {/* Header Row */}
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <div className="text-xs opacity-60 font-mono">Placed: {ord.datePlaced}</div>
-                              <h2 className="text-base font-bold group-hover:text-primary transition-colors mt-0.5">
-                                {ord.orderId}
-                              </h2>
+
+                          {/* Header Row: Order ID, Date, & Status Badge */}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-base-300/60 flex items-center justify-center text-primary font-bold shadow-inner shrink-0">
+                                📦
+                              </div>
+                              <div>
+                                <h2 className="text-base font-bold group-hover:text-primary transition-colors">
+                                  {ord.orderId}
+                                </h2>
+                                <div className="text-xs opacity-60 font-mono mt-0.5">Placed on {ord.datePlaced}</div>
+                              </div>
                             </div>
-                            <span className={`badge uppercase font-semibold text-xs tracking-wider ${ord.status === 'delivered' ? 'badge-success text-success-content' :
+
+                            <span className={`badge uppercase font-semibold text-xs tracking-wider px-3 py-2 ${ord.status === 'delivered' ? 'badge-success text-success-content' :
                               ord.status === 'out for delivery' ? 'badge-primary text-primary-content' :
                                 'badge-warning text-warning-content'
                               }`}>
@@ -213,38 +224,50 @@ export default function OrdersListPage({ orders = DUMMY_ORDERS, onSelectOrder }:
                             </span>
                           </div>
 
-                          {/* Items snippet preview */}
-                          <div className="mt-3 text-xs opacity-70 flex items-center gap-2">
-                            <span className="font-semibold">{ord.items.length} item(s):</span>
-                            <span className="truncate">{ord.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</span>
+                          {/* Visual Product Thumbnails & Names Preview */}
+                          <div className="mt-4 p-3 rounded-xl bg-base-100/60 border border-base-300/50 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2.5 overflow-hidden">
+                              <div className="flex -space-x-2 overflow-hidden shrink-0">
+                                {ord.items.slice(0, 3).map((item, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="inline-block h-9 w-9 rounded-lg object-cover ring-2 ring-base-200 shadow-xs"
+                                  />
+                                ))}
+                              </div>
+                              <div className="text-xs truncate">
+                                <span className="font-semibold block truncate">{ord.items.map(i => i.name).join(', ')}</span>
+                                <span className="opacity-60">{ord.items.reduce((acc, curr) => acc + curr.quantity, 0)} total item(s)</span>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="opacity-60 text-[10px] block uppercase font-mono">Total</span>
+                              <span className="font-extrabold text-primary text-sm">${total.toFixed(2)}</span>
+                            </div>
                           </div>
 
-                          <div className="divider my-2"></div>
+                          {/* Carrier & Delivery Info Footer */}
+                          <div className="mt-4 pt-3 border-t border-base-300 flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-4">
+                              <div>
+                                <span className="opacity-60 block text-[10px] uppercase">Carrier</span>
+                                <span className="font-medium">{ord.carrier}</span>
+                              </div>
+                              <div className="hidden sm:block">
+                                <span className="opacity-60 block text-[10px] uppercase">Est. Delivery</span>
+                                <span className={`font-medium ${delayed ? 'text-warning font-bold' : ''}`}>
+                                  {ord.estimatedDelivery} {delayed && '⚠️ Delayed'}
+                                </span>
+                              </div>
+                            </div>
 
-                          {/* Financials & Status Details */}
-                          <div className="flex items-center justify-between text-sm">
-                            <div>
-                              <span className="opacity-70 text-xs block">Carrier</span>
-                              <span className="font-medium text-xs">{ord.carrier}</span>
-                            </div>
-                            <div className="text-right">
-                              <span className="opacity-70 text-xs block">Grand Total</span>
-                              <span className="font-bold text-primary">${total.toFixed(2)}</span>
-                            </div>
-                          </div>
-
-                          {/* Footer Row with Est Delivery and Navigation link */}
-                          <div className="mt-3 pt-3 border-t border-base-300 flex items-center justify-between text-xs">
-                            <div>
-                              <span className="opacity-60">Est. Delivery: </span>
-                              <span className={`font-medium ${delayed ? 'text-warning font-bold' : ''}`}>
-                                {ord.estimatedDelivery} {delayed && '⚠️ Delayed'}
-                              </span>
-                            </div>
-                            <span className="font-semibold text-primary group-hover:underline flex items-center gap-1">
+                            <span className="font-semibold text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
                               View Details &rarr;
                             </span>
                           </div>
+
                         </div>
                       </div>
                     </Link>
