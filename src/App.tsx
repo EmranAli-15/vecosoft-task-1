@@ -191,15 +191,10 @@ export default function OrdersListPage({ orders = DUMMY_ORDERS, onSelectOrder }:
                   const delayed = isDelayed(ord.estimatedDelivery, ord.status);
                   const total = calculateOrderTotal(ord.items);
 
-                  // Dynamic border accent styling based on order status
-                  const statusBorderClass =
-                    ord.status === 'delivered' ? 'border-l-success' :
-                      ord.status === 'out for delivery' ? 'border-l-primary' : 'border-l-warning';
-
                   return (
                     // ORD-98234-US
                     <Link to={`${ord.orderId == "ORD-98234-US" ? "/no-tracking-details" : "order-details"}`} key={ord.orderId} className="block group">
-                      <div className={`card bg-base-200 border border-base-300 border-l-4 ${statusBorderClass} shadow-xs hover:shadow-md hover:border-primary transition-all duration-200 flex flex-col justify-between`}>
+                      <div className={`card bg-base-200 border border-base-300 shadow-xs hover:shadow-md hover:border-primary transition-all duration-200 flex flex-col justify-between`}>
                         <div className="card-body p-5">
 
                           {/* Header Row: Order ID, Date, & Status Badge */}

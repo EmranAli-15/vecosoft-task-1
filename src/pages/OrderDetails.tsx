@@ -77,8 +77,6 @@ export default function App() {
     const [orders, setOrders] = useState<OrderData[]>(DUMMY_ORDERS);
     const [selectedOrderId, setSelectedOrderId] = useState<string>(DUMMY_ORDERS[0].orderId);
     const [modalContent, setModalContent] = useState<{ title: string; message: string } | null>(null);
-    const [supportMessage, setSupportMessage] = useState<string>('');
-    const [supportSubmitted, setSupportSubmitted] = useState<boolean>(false);
 
     const currentOrder = orders.find(o => o.orderId === selectedOrderId) || orders[0];
 
@@ -98,26 +96,6 @@ export default function App() {
     const getStatusIndex = (st: OrderStatus) => statuses.indexOf(st);
     const currentIndex = getStatusIndex(currentOrder.status);
 
-    const handleStatusChange = (newStatus: OrderStatus) => {
-        setOrders(prev =>
-            prev.map(ord => (ord.orderId === currentOrder.orderId ? { ...ord, status: newStatus } : ord))
-        );
-    };
-
-    const handleSupportSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!supportMessage.trim()) return;
-        setSupportSubmitted(true);
-        setTimeout(() => {
-            setSupportSubmitted(false);
-            setSupportMessage('');
-            setModalContent({
-                title: 'Support Request Received',
-                message: 'Our customer support team has received your inquiry and will respond via email within 2 hours.'
-            });
-        }, 600);
-    };
-
     const calculateSubtotal = () => {
         return currentOrder.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     };
@@ -131,39 +109,51 @@ export default function App() {
             <>
                 <div className="min-h-screen bg-base-100 text-base-content font-sans antialiased selection:bg-primary selection:text-primary-content">
 
-                    <main className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+                    <main className="space-y-8">
 
                         {/* Top Status & Summary Header Card */}
                         <div className="card bg-base-200 border border-base-300 shadow-sm">
-                            <div className="card-body p-5 sm:p-8">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Order #{currentOrder.orderId}</h1>
-                                            <span className={`badge uppercase font-semibold text-xs tracking-wider ${currentOrder.status === 'delivered' ? 'badge-success text-success-content' :
-                                                currentOrder.status === 'out for delivery' ? 'badge-primary text-primary-content' :
-                                                    'badge-warning text-warning-content'
-                                                }`}>
-                                                {currentOrder.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm opacity-70 mt-1">Placed on {currentOrder.datePlaced} • Carrier: <span className="font-medium">{currentOrder.carrier}</span></p>
-                                        <p className="text-xs opacity-60 mt-0.5 font-mono">Tracking ID: {currentOrder.trackingNumber}</p>
-                                    </div>
-                                </div>
-
-                                {/* Warning Banner if order is delayed */}
-                                {orderDelayed && (
-                                    <div className="alert alert-warning mt-6 border border-warning/30 shadow-sm text-sm py-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
+                            <div className="card bg-base-200 border border-base-300 shadow-sm">
+                                <div className="card-body p-5 sm:p-8">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div>
-                                            <span className="font-bold">Delivery Delayed: </span>
-                                            Estimated delivery was <span className="underline font-semibold">{currentOrder.estimatedDelivery}</span> and has been exceeded. Our transit team is prioritizing your package.
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Order #{currentOrder.orderId}</h1>
+                                                <span className={`badge uppercase font-semibold text-xs tracking-wider ${currentOrder.status === 'delivered' ? 'badge-success text-success-content' :
+                                                    currentOrder.status === 'out for delivery' ? 'badge-primary text-primary-content' :
+                                                        'badge-warning text-warning-content'
+                                                    }`}>
+                                                    {currentOrder.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm opacity-70 mt-1">Placed on {currentOrder.datePlaced} • Carrier: <span className="font-medium">{currentOrder.carrier}</span></p>
+                                            <p className="text-xs opacity-60 mt-0.5 font-mono">Tracking ID: {currentOrder.trackingNumber}</p>
                                         </div>
                                     </div>
-                                )}
+
+                                    {/* Warning Banner if order is delayed with integrated Contact Action */}
+                                    {orderDelayed && (
+                                        <div className="alert alert-warning mt-6 border border-warning/30 shadow-sm text-sm py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-start gap-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5 mt-0.5" fill="none" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <div>
+                                                    <span className="font-bold">Delivery Delayed: </span>
+                                                    Estimated delivery was <span className="underline font-semibold">{currentOrder.estimatedDelivery}</span> and has been exceeded. Our transit team is prioritizing your package.
+                                                </div>
+                                            </div>
+
+                                            {/* Contact Action Button */}
+                                            <a
+                                                href="#support-section"
+                                                className="btn btn-sm btn-warning text-warning-content font-semibold shrink-0 shadow-xs hover:brightness-95"
+                                            >
+                                                Inquire About Delay &rarr;
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
