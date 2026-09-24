@@ -1,0 +1,76 @@
+I need to build order tracking web page. Bellow is the requirements and follow,
+
+
+
+1. The order should have a visual timeline progress bar, it should be dynamic. There are processing, shipped, out for delivery and delivered status.
+
+2. Current order status
+
+3. Estimated delivery date and ledayed order means delivery time is exceeds and it's a working sign.
+
+4. Product summary
+
+5. A section to contact support
+
+6. Fully responsive and functional
+
+
+
+and add two extra button to navigate another pages for delivered but not received the product and the tracking not available in this moment.
+
+
+
+Some instruction.
+
+The tech stack is TypeScript, React.js, TailwindCSS, DaisyUI. Use maximum 3 different color and not use heavy animation. Use an array of dummy products data. 
+
+
+
+
+-------------------------------
+--------------------------------
+-----------------------------
+
+
+
+
+Ok, I got it. It's a single ordered product details. Now build a page where show all orders. And when I chlick a order then it navigate to this page mease order details page.
+
+
+
+
+-----------------------------------------
+-----------------------------------------
+-----------------------------------------
+
+
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-base-200 p-6 rounded-2xl border border-base-300 shadow-xs">
+
+              <div>
+
+                <h1 className="text-2xl font-bold tracking-tight">Your Orders</h1>
+
+                <p className="text-sm opacity-70 mt-1">Review active shipments, track progress, or check purchase history.</p>
+
+              </div>
+
+              <div className="flex items-center gap-2">
+
+                <span className="badge badge-primary font-semibold p-3 text-xs">{orders.length} Total Orders</span>
+
+              </div>
+
+            </div>
+
+
+
+-----------------
+
+include here contac or support number or section 
+
+
+
+
+=======================================
+I did some more minor prompts for fixing some minor issue such as "make it more eye attractive, include here contact info etc."
